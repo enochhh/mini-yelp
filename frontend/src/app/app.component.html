@@ -1,0 +1,187 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" (click) = "refreshPage()" style="color:white;">Mini Yelp</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarColor02">
+       <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+             <a class="nav-link" (click)="onOpenModal(null!, 'add')"> Add Restaurant <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" (click)="onOpenModal(null!, 'random')"> Randomize <span class="sr-only">(current)</span></a>
+         </li>
+       </ul>
+       <form class="form-inline my-2 my-lg-0">
+          <input type="search" (ngModelChange) = "searchRestaurants(key.value)" #key = "ngModel"
+           ngModel name="key" id="searchName" class="form-control mr-sm-2" placeholder="Search Restaurants..." required>
+       </form>
+    </div>
+</nav>
+
+<div class="container" id = "main-container">
+    <div class="row">
+        <div *ngFor="let food of foods" class="col-md-6 col-xl-3" style="margin-top:1cm;"> 
+            <div class="card m-b-30">
+                <div class="card-body row">
+                    <div class="col-6">
+                        <a href=""><img src="{{food?.imageUrl}}" alt="" class="img-fluid rounded-circle w-60"></a>
+                    </div>
+                    <div class="col-6 card-title align-self-center mb-0">
+                        <!-- <h5 class = "text-center my-0">{{food?.name}}</h5>
+                        <p class="text-center my-0">{{food?.ethnicity}}</p> -->
+                        <h5>{{food?.name}}</h5>
+                        <p class="m-0">{{food?.ethnicity}}</p> 
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{food?.address}}</li>
+                    <li class="list-group-item"><i class="fa fa-phone float-right "></i>Phone : {{food?.phone}}</li>
+                </ul>
+                <div class="card-body">
+                    <div class="float-right btn-group btn-group-sm">
+                        <a (click)="onOpenModal(food, 'edit')" href="#" class="btn btn-primary tooltips" data-placement="top" data-toggle="tooltip" data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
+                        <a (click)="onOpenModal(food, 'delete')" href="#" class="btn btn-secondary tooltips" data-placement="top" data-toggle="tooltip" data-original-title="Delete"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Restaurant Modal -->
+<div class="modal fade" id="addRestaurantModal" tabindex="-1" aria-labelledby="addRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addRestaurantModalLabel">Add Restaurant</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form #addForm="ngForm" (ngSubmit)="onAddRestaurant(addForm)">
+                <div class="form-group">
+                   <label for="name">Name</label>
+                   <input type="text" ngModel name="name" class="form-control" id="name" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                   <label for="address">Address</label>
+                   <input type="address" ngModel name="address" class="form-control" id="address" placeholder="Address" required>
+                </div>
+                <div class="form-group">
+                   <label for="ethnicity">Ethnicity</label>
+                   <input type="text" ngModel name="ethnicity" class="form-control" id="ethnicity" placeholder="Ethnicity" required>
+                </div>
+                <div class="form-group">
+                   <label for="phone">Phone</label>
+                   <input type="text" ngModel name="phone" class="form-control" id="phone" placeholder="Phone" required>
+                </div>
+                <div class="form-group">
+                   <label for="imageUrl">Image URL</label>
+                   <input type="text" ngModel name="imageUrl" class="form-control" id="imageUrl" placeholder="Image URL" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id = "add-restaurant-form" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button [disabled]= "addForm.invalid" type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+  <!-- Edit Restaurant Modal -->
+  <div class="modal fade" id="updateRestaurantModal" tabindex="-1" role="dialog" aria-labelledby="restaurantEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title" id="updateRestaurantModalLabel">Edit Restaurant {{editRestaurant?.name}}</h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+             <span aria-hidden="true">&times;</span>
+             </button>
+          </div>
+          <div class="modal-body">
+             <form #editForm="ngForm">
+                <div class="form-group">
+                   <label for="name">Name</label>
+                   <input type="text" ngModel="{{editRestaurant?.name}}" name="name" class="form-control" id="name" aria-describedby="emailHelp" placeholder="Name">
+                </div>
+                <input type="hidden" ngModel="{{editRestaurant?.id}}" name="id" class="form-control" id="id" placeholder="Email">
+                <div class="form-group">
+                   <label for="address">Address</label>
+                   <input type="address" ngModel="{{editRestaurant?.address}}" name="address" class="form-control" id="address" placeholder="Address">
+                </div>
+                <div class="form-group">
+                   <label for="phone">Ethnicity</label>
+                   <input type="text" ngModel="{{editRestaurant?.ethnicity}}" name="ethnicity" class="form-control" id="Ethnicity" placeholder="Ethnicity">
+                </div>
+                <div class="form-group">
+                   <label for="phone">Phone</label>
+                   <input type="text" ngModel="{{editRestaurant?.phone}}" name="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
+                </div>
+                <div class="form-group">
+                   <label for="phone">Image URL</label>
+                   <input type="text" ngModel="{{editRestaurant?.imageUrl}}" name="imageUrl" class="form-control" id="imageUrl" placeholder="Image URL">
+                </div>
+                <div class="modal-footer">
+                   <button type="button" id="" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                   <button (click)="onUpdateRestaurant(editForm.value)" data-dismiss="modal" class="btn btn-primary" >Save changes</button>
+                </div>
+             </form>
+          </div>
+       </div>
+    </div>
+  </div> 
+
+  <!-- Delete Modal-->
+<div class="modal fade" id="deleteRestaurantModal" tabindex="-1" role="dialog" aria-labelledby="deleteModelLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title" id="deleteModelLabel">Delete Restaurant</h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+             <span aria-hidden="true">&times;</span>
+             </button>
+          </div>
+          <div class="modal-body">
+             <p>Are you sure you want to delete Restaurant {{deleteRestaurant?.name}}?</p>
+             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button (click)="onDeleteRestaurant(deleteRestaurant!.id)" class="btn btn-danger" data-dismiss="modal">Yes</button>
+             </div>
+          </div>
+       </div>
+    </div>
+</div> 
+
+ <!-- Random Modal-->
+ <div class="modal fade" id="randomRestaurantModal" tabindex="-1" role="dialog" aria-labelledby="randomModelLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title" id="randomModelLabel">Randomize Restaurant</h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+             <span aria-hidden="true">&times;</span>
+             </button>
+          </div>
+          <div class="modal-body">
+             <p>Want me to pick for you?</p>
+             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button (click)="onRandomRestaurant()" class="btn btn-danger" data-dismiss="modal">Yes</button>
+             </div>
+          </div>
+       </div>
+    </div>
+</div> 
+
+<!-- Notification for no employees -->
+<div *ngIf="foods?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
+    <div class="alert alert-info" role="alert">
+      <h4 class="alert-heading">Sorry, no restaurants found!</h4>
+      <p>Please try a different search</p>
+    </div>
+    </div>
+  

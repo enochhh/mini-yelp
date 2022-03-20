@@ -1,0 +1,7 @@
+{
+    "name": "Mama Lu's Dumpling House",
+    "address": "153 E Garvey Ave, Montery Park, CA 91755",
+    "ethnicity": "Chinese",
+    "phone":"(626) 307-5700",
+    "imageUrl": "https://cdn.doordash.com/media/restaurant/cover/Mama_Lus_Dumpling_House_Logo.jpg"
+}
